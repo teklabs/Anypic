@@ -291,10 +291,18 @@
 #pragma mark - PAPPhotoHeaderViewDelegate
 
 - (void)photoHeaderView:(PAPPhotoHeaderView *)photoHeaderView didTapUserButton:(UIButton *)button user:(PFUser *)user {
-    PAPAccountViewController *accountViewController = [[PAPAccountViewController alloc] initWithUser:user];
-    NSLog(@"Presenting account view controller with user: %@", user);
-    [accountViewController setUser:user];
-    [self.navigationController pushViewController:accountViewController animated:YES];
+    if ([self isKindOfClass:[PAPAccountViewController class]]) {
+        CAKeyframeAnimation * anim = [ CAKeyframeAnimation animationWithKeyPath:@"transform" ] ;
+        anim.values = @[ [ NSValue valueWithCATransform3D:CATransform3DMakeTranslation(-5.0f, 0.0f, 0.0f) ], [ NSValue valueWithCATransform3D:CATransform3DMakeTranslation(5.0f, 0.0f, 0.0f) ] ] ;
+        anim.autoreverses = YES ;
+        anim.repeatCount = 2.0f ;
+        anim.duration = 0.07f ;
+        [self.view.layer addAnimation:anim forKey:nil];
+    } else {
+        PAPAccountViewController *accountViewController = [[PAPAccountViewController alloc] initWithUser:user];
+        [accountViewController setUser:user];
+        [self.navigationController pushViewController:accountViewController animated:YES];
+    }
 }
 
 - (void)photoHeaderView:(PAPPhotoHeaderView *)photoHeaderView didTapLikePhotoButton:(UIButton *)button photo:(PFObject *)photo {
