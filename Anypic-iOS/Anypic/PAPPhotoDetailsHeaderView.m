@@ -249,7 +249,7 @@ static TTTTimeIntervalFormatter *timeFormatter;
         [avatarImageView setOpaque:NO];
         [avatarImageView.profileButton addTarget:self action:@selector(didTapUserNameButtonAction:) forControlEvents:UIControlEventTouchUpInside];
         [avatarImageView setContentMode:UIViewContentModeScaleAspectFill];
-        avatarImageView.layer.cornerRadius = 66.0f;
+        avatarImageView.layer.cornerRadius = avatarImageDim / 2.0f;
         avatarImageView.layer.masksToBounds = YES;
         //[avatarImageView load:^(UIImage *image, NSError *error) {}];
         [nameHeaderView addSubview:avatarImageView];
