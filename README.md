@@ -4,6 +4,9 @@ Anypic is the easiest way to share photos with your friends. Get the app and sha
 
 You can get the [source code](https://github.com/ParsePlatform/Anypic) and create your own Anypic with this [tutorial](https://parse.com/tutorials/anypic).
 
+## Language
+
+Anypic is written in Objective-C. If you are looking for a Swift version, you can check out this port by @kwkhaw: https://github.com/kwkhaw/SwiftAnyPic
 
 ## iOS Setup
 
