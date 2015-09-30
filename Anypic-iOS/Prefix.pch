@@ -15,7 +15,7 @@
     #import <MobileCoreServices/UTCoreTypes.h>
     #import <Parse/Parse.h>
     #import <ParseUI/ParseUI.h>
-    #import <ParseFacebookUtils/PFFacebookUtils.h>
+    #import <ParseFacebookUtilsV4/ParseFacebookUtilsV4.h>
     #import <ParseCrashReporting/ParseCrashReporting.h>
     #import "PAPCache.h"
     #import "PAPConstants.h"

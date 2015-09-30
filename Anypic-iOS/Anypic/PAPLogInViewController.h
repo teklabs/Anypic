@@ -6,9 +6,11 @@
 //  Copyright (c) 2013 Parse. All rights reserved.
 //
 
+#import <FBSDKLoginKit/FBSDKLoginKit.h>
+
 @protocol PAPLogInViewControllerDelegate;
 
-@interface PAPLogInViewController : UIViewController <FBLoginViewDelegate>
+@interface PAPLogInViewController : UIViewController <FBSDKLoginButtonDelegate>
 
 @property (nonatomic, assign) id<PAPLogInViewControllerDelegate> delegate;
 

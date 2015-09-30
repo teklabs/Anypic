@@ -176,7 +176,7 @@
 + (BOOL)userHasValidFacebookData:(PFUser *)user {
     // Check that PFUser has valid fbid that matches current FBSessions userId
     NSString *facebookId = [user objectForKey:kPAPUserFacebookIDKey];
-    return (facebookId && facebookId.length > 0 && [facebookId isEqualToString:[[[PFFacebookUtils session] accessTokenData] userID]]);
+    return (facebookId && facebookId.length > 0 && [facebookId isEqualToString:[FBSDKAccessToken currentAccessToken].userID]);
 }
 
 + (BOOL)userHasProfilePictures:(PFUser *)user {
