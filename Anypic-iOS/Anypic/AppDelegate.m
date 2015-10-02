@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+
 #import "Reachability.h"
 #import "MBProgressHUD.h"
 #import "PAPHomeViewController.h"
@@ -45,7 +47,7 @@
     // Parse initialization
     [ParseCrashReporting enable];
     [Parse setApplicationId:@"PklSbwxITu46cOumt6tdWw8Jtg2urg0vj0CrbLr0" clientKey:@"ML2sjwLC7k1RCujNCRP7fxG2HpUxtwzdIR1ElOe7"];
-    [PFFacebookUtils initializeFacebook];
+    [PFFacebookUtils initializeFacebookWithApplicationLaunchOptions:launchOptions];
     // ****************************************************************************
   
     // Track app open.
@@ -81,13 +83,10 @@
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    BOOL wasHandled = false;
-    
-    if ([PFFacebookUtils session]) {
-        wasHandled |= [FBAppCall handleOpenURL:url sourceApplication:sourceApplication withSession:[PFFacebookUtils session]];
-    } else {
-        wasHandled |= [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
-    }
+    BOOL wasHandled = [[FBSDKApplicationDelegate sharedInstance] application:application
+                                                                     openURL:url
+                                                           sourceApplication:sourceApplication
+                                                                  annotation:annotation];
     
     wasHandled |= [self handleActionURL:url];
 
@@ -149,7 +148,7 @@
     application.applicationIconBadgeNumber = 1;
     application.applicationIconBadgeNumber = 0;
 
-    [FBAppCall handleDidBecomeActiveWithSession:[PFFacebookUtils session]];
+    [FBSDKAppEvents activateApp];
 }
 
 
@@ -228,7 +227,7 @@
     
     // Log out
     [PFUser logOut];
-    [FBSession setActiveSession:nil];
+    [FBSDKAccessToken setCurrentAccessToken:nil];
     
     // clear out cached data, view controllers, etc
     [self.navController popToRootViewControllerAnimated:NO];

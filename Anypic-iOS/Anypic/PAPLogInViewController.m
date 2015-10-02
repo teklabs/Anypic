@@ -12,16 +12,10 @@
 #import "MBProgressHUD.h"
 
 @interface PAPLogInViewController() {
-    FBLoginView *_facebookLoginView;
+    FBSDKLoginButton *_facebookLoginView;
 }
 
 @property (nonatomic, strong) MBProgressHUD *hud;
-
-@end
-
-@interface FBSession (Private)
-
-- (void)clearAffinitizedThread;
 
 @end
 
@@ -46,10 +40,10 @@
         yPosition = 450.0f;
     }
     
-    _facebookLoginView = [[FBLoginView alloc] initWithReadPermissions:@[@"public_profile", @"user_friends", @"email", @"user_photos"]];
-    _facebookLoginView.frame = CGRectMake(36.0f, yPosition, 244.0f, 44.0f);
+    _facebookLoginView = [[FBSDKLoginButton alloc] initWithFrame:CGRectMake(36.0f, yPosition, 244.0f, 44.0f)];
+    _facebookLoginView.readPermissions = @[@"public_profile", @"user_friends", @"email", @"user_photos"];
     _facebookLoginView.delegate = self;
-    _facebookLoginView.tooltipBehavior = FBLoginViewTooltipBehaviorDisable;
+    _facebookLoginView.tooltipBehavior = FBSDKLoginButtonTooltipBehaviorDisable;
     [self.view addSubview:_facebookLoginView];
 }
 
@@ -62,14 +56,20 @@
 }
 
 
-#pragma mark - FBLoginViewDelegate
+#pragma mark - FBSDKLoginButtonDelegate
 
-- (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView {
-    [self handleFacebookSession];
+- (void)  loginButton:(FBSDKLoginButton *)loginButton
+didCompleteWithResult:(FBSDKLoginManagerLoginResult *)result
+                error:(NSError *)error {
+    if (!error) {
+        [self handleFacebookSession];
+    } else {
+        [self handleLogInError:error];
+    }
 }
 
-- (void)loginView:(FBLoginView *)loginView handleError:(NSError *)error {
-    [self handleLogInError:error];
+- (void)loginButtonDidLogOut:(FBSDKLoginButton *)loginButton {
+    // No op
 }
 
 - (void)handleFacebookSession {
@@ -79,41 +79,26 @@
         }
         return;
     }
-    
-    NSString *accessToken = [[[FBSession activeSession] accessTokenData] accessToken];
-    NSDate *expirationDate = [[[FBSession activeSession] accessTokenData] expirationDate];
-    NSString *facebookUserId = [[[FBSession activeSession] accessTokenData] userID];
-    
-    if (!accessToken || !facebookUserId) {
+
+    if (![FBSDKAccessToken currentAccessToken]) {
         NSLog(@"Login failure. FB Access Token or user ID does not exist");
         return;
     }
     
     self.hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    
-    // Unfortunately there are some issues with accessing the session provided from FBLoginView with the Parse SDK's (thread affinity)
-    // Just work around this by setting the session to nil, since the relevant values will be discarded anyway when linking with Parse (permissions flag on FBAccessTokenData)
-    // that we need to get back again with a refresh of the session
-    if ([[FBSession activeSession] respondsToSelector:@selector(clearAffinitizedThread)]) {
-        [[FBSession activeSession] performSelector:@selector(clearAffinitizedThread)];
-    }
-    
-    [PFFacebookUtils logInWithFacebookId:facebookUserId
-                             accessToken:accessToken
-                          expirationDate:expirationDate
-                                   block:^(PFUser *user, NSError *error) {
-                                       
-                                       if (!error) {
-                                           [self.hud removeFromSuperview];
-                                           if (self.delegate) {
-                                               if ([self.delegate respondsToSelector:@selector(logInViewControllerDidLogUserIn:)]) {
-                                                   [self.delegate performSelector:@selector(logInViewControllerDidLogUserIn:) withObject:user];
-                                               }
-                                           }
-                                       } else {
-                                           [self cancelLogIn:error];
-                                       }
-                                   }];
+
+    [PFFacebookUtils logInInBackgroundWithAccessToken:[FBSDKAccessToken currentAccessToken] block:^(PFUser *user, NSError *error) {
+        if (!error) {
+            [self.hud removeFromSuperview];
+            if (self.delegate) {
+                if ([self.delegate respondsToSelector:@selector(logInViewControllerDidLogUserIn:)]) {
+                    [self.delegate performSelector:@selector(logInViewControllerDidLogUserIn:) withObject:user];
+                }
+            }
+        } else {
+            [self cancelLogIn:error];
+        }
+    }];
 }
 
 
@@ -126,7 +111,7 @@
     }
     
     [self.hud removeFromSuperview];
-    [[FBSession activeSession] closeAndClearTokenInformation];
+    [FBSDKAccessToken setCurrentAccessToken:nil];
     [PFUser logOut];
     [(AppDelegate *)[[UIApplication sharedApplication] delegate] presentLoginViewController:NO];
 }
@@ -143,7 +128,7 @@
         
         if (error.code == kPFErrorFacebookInvalidSession) {
             NSLog(@"Invalid session, logging out.");
-            [[FBSession activeSession] closeAndClearTokenInformation];
+            [FBSDKAccessToken setCurrentAccessToken:nil];
             return;
         }
         

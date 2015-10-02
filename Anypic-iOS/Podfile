@@ -3,7 +3,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 workspace 'Anypic'
 
 pod 'Parse'
-pod 'ParseFacebookUtils'
+pod 'ParseFacebookUtilsV4'
 pod 'ParseCrashReporting'
 pod 'ParseUI'
 pod 'MBProgressHUD'
