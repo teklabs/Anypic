@@ -1,12 +1,11 @@
-# Anypic
+# Anypost
 
-Anypic is the easiest way to share photos with your friends. Get the app and share your fun photos with the world. [Anypic](https://anypic.org) is fully powered by [Parse](https://parse.com). 
+Anypost is the easiest way to share info with your friends. Get the app and share your info with the world. [Anyppst] is fully powered by [Parse](https://parse.com). 
 
-You can get the [source code](https://github.com/ParsePlatform/Anypic) and create your own Anypic with this [tutorial](https://parse.com/tutorials/anypic).
 
 ## Language
 
-Anypic is written in Objective-C. If you are looking for a Swift version, you can check out this port by @kwkhaw: https://github.com/kwkhaw/SwiftAnyPic
+Anypost is written in Swift. If you are looking for a Swift version, you can check out this port by @kwkhaw: https://github.com/kwkhaw/SwiftAnyPic
 
 ## iOS Setup
 
